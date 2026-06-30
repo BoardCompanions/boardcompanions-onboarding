@@ -250,6 +250,8 @@
     border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
+    max-height: 320px;
+    overflow-y: auto;
     font-size: 0.82rem;
     line-height: 1.8;
     color: var(--bc-dark);
@@ -772,33 +774,32 @@
     document.getElementById('naam-modal').classList.remove('active');
     currentCompanionName = naam;
 
-    // Zoek in Monday
-    const mondayItem = await findCompanionInMonday(naam);
-    if (mondayItem) {
-      currentCompanionId = mondayItem.id;
-      // Update onboarding status in Monday
-      await updateMonday(currentCompanionId, { "color_mm4mdrg1": { "label": "Done" } });
-    }
-
-    // Mark step 1 done
+    // Mark step 1 done — direct, niet wachten op Monday
     document.getElementById('badge-1').className = 'card-step-badge done';
     document.getElementById('badge-1').textContent = '✓ Done';
 
     const card1body = document.querySelector('#card-1 .card-body');
     const done = document.createElement('div');
     done.className = 'status-done';
-    done.innerHTML = mondayItem
-      ? '✅ Profile completed — saved in our system'
-      : '✅ Profile completed';
+    done.innerHTML = '✅ Profile completed';
     card1body.prepend(done);
 
-    // Unlock step 2
+    // Unlock step 2 — gebeurt altijd, ongeacht Monday resultaat
     document.getElementById('card-2').classList.remove('inactive-card');
     document.getElementById('badge-2').className = 'card-step-badge';
     document.getElementById('badge-2').textContent = 'Step 2';
 
     setStepActive(2);
     document.getElementById('card-2').scrollIntoView({behavior:'smooth', block:'start'});
+
+    // Monday koppeling op de achtergrond — blokkeert de flow niet meer
+    findCompanionInMonday(naam).then(mondayItem => {
+      if (mondayItem) {
+        currentCompanionId = mondayItem.id;
+        updateMonday(currentCompanionId, { "color_mm4mdrg1": { "label": "Done" } });
+        done.innerHTML = '✅ Profile completed — saved in our system';
+      }
+    }).catch(e => console.error('Monday lookup failed (non-blocking):', e));
   }
 
   function checkCharter() {
