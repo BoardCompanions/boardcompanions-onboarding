@@ -698,7 +698,6 @@
   // Set dates
   const today = new Date().toLocaleDateString('nl-NL', {day:'numeric',month:'long',year:'numeric'});
   document.getElementById('charter-date').innerHTML = 'Datum: <strong>' + today + '</strong>';
-  document.getElementById('coc-date').innerHTML = 'Datum: <strong>' + today + '</strong>';
 
   function checkGDPR() {
     const agreed = document.getElementById('gdpr-agree').checked;
